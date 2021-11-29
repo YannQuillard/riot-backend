@@ -23,6 +23,8 @@ Icon
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
+.idea
+.vscode
 
 # Directories potentially created on remote AFP share
 .AppleDB
