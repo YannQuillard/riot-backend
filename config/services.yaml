@@ -4,7 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
+    riot_base_url_europe: '%env(resolve:RIOT_BASE_URL_EUROPE)%'
+    riot_base_url_euw: '%env(resolve:RIOT_BASE_URL_EUW)%'
+    riot_token: '%env(resolve:RIOT_TOKEN)%'
 services:
     # default configuration for services in *this* file
     _defaults:
