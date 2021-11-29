@@ -21,13 +21,13 @@ class CompositionChampion
      * @ORM\ManyToOne(targetEntity=Compositions::class, inversedBy="compositionChampions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $CompositionId;
+    private $compositionId;
 
     /**
      * @ORM\ManyToOne(targetEntity=Champions::class, inversedBy="compositionChampions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $ChampionId;
+    private $championId;
 
     public function getId(): ?int
     {
@@ -36,24 +36,24 @@ class CompositionChampion
 
     public function getCompositionId(): ?Compositions
     {
-        return $this->CompositionId;
+        return $this->compositionId;
     }
 
-    public function setCompositionId(?Compositions $CompositionId): self
+    public function setCompositionId(?Compositions $compositionId): self
     {
-        $this->CompositionId = $CompositionId;
+        $this->compositionId = $compositionId;
 
         return $this;
     }
 
     public function getChampionId(): ?Champions
     {
-        return $this->ChampionId;
+        return $this->championId;
     }
 
-    public function setChampionId(?Champions $ChampionId): self
+    public function setChampionId(?Champions $championId): self
     {
-        $this->ChampionId = $ChampionId;
+        $this->championId = $championId;
 
         return $this;
     }

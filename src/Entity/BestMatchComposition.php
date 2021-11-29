@@ -21,13 +21,13 @@ class BestMatchComposition
      * @ORM\ManyToOne(targetEntity=Compositions::class, inversedBy="bestMatchCompositions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $CompositionId;
+    private $compositionId;
 
     /**
      * @ORM\ManyToOne(targetEntity=BestMatch::class, inversedBy="bestMatchCompositions")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $BestMatchId;
+    private $bestMatchId;
 
     /**
      * @ORM\Column(type="boolean")
@@ -41,24 +41,24 @@ class BestMatchComposition
 
     public function getCompositionId(): ?Compositions
     {
-        return $this->CompositionId;
+        return $this->compositionId;
     }
 
-    public function setCompositionId(?Compositions $CompositionId): self
+    public function setCompositionId(?Compositions $compositionId): self
     {
-        $this->CompositionId = $CompositionId;
+        $this->compositionId = $compositionId;
 
         return $this;
     }
 
     public function getBestMatchId(): ?BestMatch
     {
-        return $this->BestMatchId;
+        return $this->bestMatchId;
     }
 
-    public function setBestMatchId(?BestMatch $BestMatchId): self
+    public function setBestMatchId(?BestMatch $bestMatchId): self
     {
-        $this->BestMatchId = $BestMatchId;
+        $this->bestMatchId = $bestMatchId;
 
         return $this;
     }
