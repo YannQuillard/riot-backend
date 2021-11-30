@@ -29,6 +29,11 @@ class BestMatch
      */
     private $bestMatchCompositions;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $riotId;
+
     public function __construct()
     {
         $this->bestMatchCompositions = new ArrayCollection();
@@ -77,6 +82,18 @@ class BestMatch
                 $bestMatchComposition->setBestMatch(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRiotId(): ?string
+    {
+        return $this->riotId;
+    }
+
+    public function setRiotId(string $riotId): self
+    {
+        $this->riotId = $riotId;
 
         return $this;
     }
