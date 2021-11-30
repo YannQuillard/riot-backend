@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\Compositions;
+use App\Entity\Champion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Compositions|null find($id, $lockMode = null, $lockVersion = null)
- * @method Compositions|null findOneBy(array $criteria, array $orderBy = null)
- * @method Compositions[]    findAll()
- * @method Compositions[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Champion|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Champion|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Champion[]    findAll()
+ * @method Champion[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CompositionsRepository extends ServiceEntityRepository
+class ChampionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Compositions::class);
+        parent::__construct($registry, Champion::class);
     }
 
     // /**
-    //  * @return Compositions[] Returns an array of Compositions objects
+    //  * @return Champion[] Returns an array of Champion objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class CompositionsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Compositions
+    public function findOneBySomeField($value): ?Champion
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.exampleField = :val')
