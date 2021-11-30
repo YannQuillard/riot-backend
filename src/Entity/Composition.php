@@ -39,9 +39,15 @@ class Composition
      */
     private $champions;
 
+    /**
+     * @ORM\OneToMany(targetEntity=BestMatchComposition::class, mappedBy="composition", orphanRemoval=true)
+     */
+    private $bestMatchCompositions;
+
     public function __construct()
     {
         $this->champions = new ArrayCollection();
+        $this->bestMatchCompositions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -105,6 +111,36 @@ class Composition
     public function removeChampion(Champion $champion): self
     {
         $this->champions->removeElement($champion);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|BestMatchComposition[]
+     */
+    public function getBestMatchCompositions(): Collection
+    {
+        return $this->bestMatchCompositions;
+    }
+
+    public function addBestMatchComposition(BestMatchComposition $bestMatchComposition): self
+    {
+        if (!$this->bestMatchCompositions->contains($bestMatchComposition)) {
+            $this->bestMatchCompositions[] = $bestMatchComposition;
+            $bestMatchComposition->setComposition($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBestMatchComposition(BestMatchComposition $bestMatchComposition): self
+    {
+        if ($this->bestMatchCompositions->removeElement($bestMatchComposition)) {
+            // set the owning side to null (unless already changed)
+            if ($bestMatchComposition->getComposition() === $this) {
+                $bestMatchComposition->setComposition(null);
+            }
+        }
 
         return $this;
     }
