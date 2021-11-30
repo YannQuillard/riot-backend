@@ -26,6 +26,6 @@ class CompositionsController extends AbstractController
         $riotChallenger = $this->compositionService->getChallengers();
         $challengerMatchs = $this->compositionService->getMatchsInfo($riotChallenger);
 
-        return $this->json($riotChallenger);
+        return $this->json($challengerMatchs);
     }
 }
