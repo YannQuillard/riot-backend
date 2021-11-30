@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\BestMatch;
+use App\Entity\BestMatchComposition;
 use App\Entity\Champion;
 use App\Entity\Composition;
 use Doctrine\ORM\EntityManagerInterface;
@@ -99,9 +101,9 @@ class CompositionService
     {
         $returnArray = [];
 
-        //foreach ($challengers['entries'] as $index => $player) {
+        foreach ($challengers['entries'] as $index => $player) {
 
-            $player = $challengers['entries'][3];
+            //$player = $challengers['entries'][3];
 
             $summonerId = $player['summonerId'];
             $player = $this->getSummoner($summonerId);
@@ -130,8 +132,8 @@ class CompositionService
                         ];
                     }
                 }
-
                 $matchResult[] = [
+                    'id' => $match['metadata']['matchId'],
                     'matchDate' => $match['info']['gameCreation'],
                     'compositions' => [
                         [
@@ -144,24 +146,41 @@ class CompositionService
                         ],
                     ]
                 ];
-            //}
+            }
             $returnArray[] = $matchResult;
             $this->storeMatch($matchResult);
-            //echo sprintf('Sleeping for 30s, fetched player %s', $index);
-            //sleep(30);
+            echo sprintf("Sleeping for 30s, fetched player %s \n", $index);
+            sleep(30);
         }
-        return $matchResult;
-        //return $returnArray;
+        //return $matchResult;
+        return $returnArray;
     }
 
     public function storeMatch($arrayMatchs) {
         foreach ($arrayMatchs as $match) {
-            //$bestMatch = new BestMatch();
-            //$date = new \DateTime();
-            //$date->setTimestamp($match['matchDate']);
-            //$bestMatch->setDateMatch($date);
-            $this->storeComposition($match);
+            $existingMatch  = $this->entityManager->getRepository(BestMatch::class)->findOneByRiotId($match['id']);
+
+            if (null !== $existingMatch) {
+                continue;
+            }
+            $bestMatch = new BestMatch();
+            $date = new \DateTime();
+            $date->setTimestamp($match['matchDate'] / 1000);
+            $bestMatch->setDateMatch($date);
+            $bestMatch->setRiotId($match['id']);
+            $compositions = $this->storeComposition($match);
+
+            foreach ($compositions as $composition) {
+                $bestMatchComposition = new BestMatchComposition();
+                $bestMatchComposition
+                    ->setBestMatch($bestMatch)
+                    ->setComposition($composition['composition'])
+                    ->setWin($composition['win']);
+                $this->entityManager->persist($bestMatchComposition);
+            }
+            $this->entityManager->persist($bestMatch);
         }
+        $this->entityManager->flush();
     }
 
     public function storeChampions(array $champions): array {
@@ -184,17 +203,18 @@ class CompositionService
     }
 
     public function storeComposition($match) {
+        $compositions = [];
         foreach ($match['compositions'] as $composition) {
-            // CREATE CHAMPIONS IF DOESN'T EXIST
             $this->storeChampions($composition['champions']);
 
-            $allChampions = array_map(function($champion) {
-                $championEntity = $this->entityManager->getRepository(Champion::class)->findOneByRiotId($champion['id']);
-                return $championEntity;
+            $allChampionsId = array_map(function($champion) {
+                return $champion['id'];
             }, $composition['champions']);
 
-            $string = sprintf('%s%s%s%s%s', $allChampions[0]->getId(), $allChampions[1]->getId(), $allChampions[2]->getId(), $allChampions[3]->getId(), $allChampions[4]->getId());
+            $championEntitys = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($allChampionsId);
+            $string = sprintf('%s%s%s%s%s', $championEntitys[0]->getRiotId(), $championEntitys[1]->getRiotId(), $championEntitys[2]->getRiotId(), $championEntitys[3]->getRiotId(), $championEntitys[4]->getRiotId());
             $hash = sha1($string);
+
             $result = $this->entityManager->getRepository(Composition::class)->findByHash($hash);
 
             if(empty($result)) {
@@ -211,20 +231,25 @@ class CompositionService
                 $compositionEntity = $this->entityManager->getRepository(Composition::class)->findOneById($result);
             }
 
+            if($composition['win']) {
+                $compositionEntityWins = $compositionEntity->getWins();
+                $compositionEntityWins++;
+                $compositionEntity->setWins($compositionEntityWins);
+            }
+            else {
+                $compositionEntityLosses = $compositionEntity->getLosses();
+                $compositionEntityLosses++;
+                $compositionEntity->setLosses($compositionEntityLosses);
+            }
+
             $this->entityManager->persist($compositionEntity);
+            $compositions[] = [
+                'composition' => $compositionEntity,
+                'win' => $composition['win'],
+            ];
         }
         $this->entityManager->flush();
-    }
 
-    public function storePoint() {
-
-        /*if($composition['win']) {
-            $compositionEntityWins = $compositionEntity->getWins();
-            $compositionEntity->setWins($compositionEntityWins);
-        }
-        else {
-            $compositionEntityLosses = $compositionEntity->getLosses();
-            $compositionEntity->setLosses($compositionEntityLosses);
-        }*/
+        return $compositions;
     }
 }

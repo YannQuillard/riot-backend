@@ -39,8 +39,7 @@ class FetchCompoCommand extends Command
         $arg1 = $input->getArgument('arg1');
 
         $riotChallenger = $this->compositionService->getChallengers();
-        $challengerMatchs = $this->compositionService->getMatchsInfo($riotChallenger);
-        //$this->compositionService->storeMatch($riotChallenger);
+        $this->compositionService->getMatchsInfo($riotChallenger);
 
         $io->writeln('Compositions fetched successfully');
 
