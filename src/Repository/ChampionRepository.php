@@ -19,15 +19,6 @@ class ChampionRepository extends ServiceEntityRepository
         parent::__construct($registry, Champion::class);
     }
 
-    public function getChampionsForIds(array $ids) {
-        return $this->createQueryBuilder('c')
-            ->where('c.riotId IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->orderBy('c.riotId', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
     // /**
     //  * @return Champion[] Returns an array of Champion objects
     //  */
