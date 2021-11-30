@@ -2,12 +2,8 @@
 
 namespace App\Service;
 
-use App\Entity\BestMatch;
-use App\Entity\Champions;
-use App\Entity\CompositionChampion;
-use App\Entity\Compositions;
-use App\Repository\CompositionChampionRepository;
-use App\Repository\CompositionsRepository;
+use App\Entity\Champion;
+use App\Entity\Composition;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -61,9 +57,9 @@ class CompositionService
         $result = json_decode($response->getContent(), true);
         $returnArray = [];
 
-        // foreach ($result['entries'] as $player) {
+        foreach ($result['entries'] as $player) {
 
-            $player = $result['entries'][4];
+            //$player = $result['entries'][4];
 
             $summonerId = $player['summonerId'];
             $player = $this->getSummoner($summonerId);
@@ -108,9 +104,9 @@ class CompositionService
                 ];
             }
             $returnArray[] = $matchResult;
-        //}
-        return $matchResult;
-        //return $returnArray;
+        }
+        //return $matchResult;
+        return $returnArray;
     }
 
     /**
@@ -184,52 +180,46 @@ class CompositionService
 
     public function createComposition($arrayMatchs) {
         foreach ($arrayMatchs as $match) {
-            $bestMatch = new BestMatch();
-            $date = new \DateTime();
-            $date->setTimestamp($match['matchDate']);
-
-            $bestMatch->setDateMatch($date);
+            //$bestMatch = new BestMatch();
+            //$date = new \DateTime();
+            //$date->setTimestamp($match['matchDate']);
+            //$bestMatch->setDateMatch($date);
 
             foreach ($match['compositions'] as $composition) {
                 // CREATE CHAMPIONS IF DOESN'T EXIST
                 $this->createChampions($composition['champions']);
 
                 $allChampions = array_map(function($champion) {
-                    $championEntity = $this->entityManager->getRepository(Champions::class)->findOneByChampionId($champion['id']);
-                    return $championEntity->getId();
+                    $championEntity = $this->entityManager->getRepository(Champion::class)->findOneByRiotId($champion['id']);
+                    return $championEntity;
                 }, $composition['champions']);
 
-                //$result = $this->entityManager->getRepository(CompositionsRepository::class)->getCompositionForChampion();
-                dd($allChampions);
+                $string = sprintf('%s%s%s%s%s', $allChampions[0]->getId(), $allChampions[1]->getId(), $allChampions[2]->getId(), $allChampions[3]->getId(), $allChampions[4]->getId());
+                $hash = sha1($string);
+                $result = $this->entityManager->getRepository(Composition::class)->findByHash($hash);
 
                 if(empty($result)) {
-                    $compositionEntity = new Compositions();
-                    $this->entityManager->persist($compositionEntity);
-                    $this->entityManager->flush();
+                    $compositionEntity = new Composition();
+                    $compositionEntity->setHash($hash);
 
                     foreach ($composition['champions'] as $champion) {
-                        $compositionChampionEntity = new CompositionChampion();
-                        $championEntity = $this->entityManager->getRepository(Champions::class)->findOneByChampionId($champion['id']);
-                        $compositionChampionEntity
-                            ->setChampionId($championEntity)
-                            ->setCompositionId($compositionEntity);
-                        $this->entityManager->persist($compositionChampionEntity);
+                        $championEntity = $this->entityManager->getRepository(Champion::class)->findOneByRiotId($champion['id']);
+                        $compositionEntity
+                            ->addChampion($championEntity);
                     }
-
-                    $this->entityManager->flush();
                 }
                 else {
-                    $compositionEntity = $this->entityManager->getRepository(Compositions::class)->findOneById($result);
+                    $compositionEntity = $this->entityManager->getRepository(Composition::class)->findOneById($result);
                 }
 
-                if($composition['win']) {
+                /*if($composition['win']) {
                     $compositionEntityWins = $compositionEntity->getWins();
-                    $compositionEntity->setWins($compositionEntityWins + 1);
+                    $compositionEntity->setWins($compositionEntityWins);
                 }
                 else {
                     $compositionEntityLosses = $compositionEntity->getLosses();
-                    $compositionEntity->setLosses($compositionEntityLosses + 1);
-                }
+                    $compositionEntity->setLosses($compositionEntityLosses);
+                }*/
 
                 $this->entityManager->persist($compositionEntity);
                 $this->entityManager->flush();
@@ -244,23 +234,19 @@ class CompositionService
     public function createChampions(array $champions): array {
         $championsId = [];
         foreach ($champions as $champion) {
-            $existingChampion = $this->entityManager->getRepository(Champions::class)->findOneByChampionId($champion['id']);
+            $existingChampion = $this->entityManager->getRepository(Champion::class)->findOneByRiotId($champion['id']);
             if (null !== $existingChampion) {
                 continue;
             }
 
-            $championEntity = new Champions();
+            $championEntity = new Champion();
             $championEntity
-                ->setChampionId($champion['id'])
+                ->setRiotId($champion['id'])
                 ->setName($champion['name']);
             $this->entityManager->persist($championEntity);
             $championsId[] = $champion['id'];
         }
         $this->entityManager->flush();
         return $championsId;
-    }
-
-    public function addPoint() {
-
     }
 }
