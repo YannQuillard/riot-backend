@@ -54,6 +54,21 @@ class Champion
      */
     private $type;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $images;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $wins;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $losses;
+
     public function __construct()
     {
         $this->compositions = new ArrayCollection();
@@ -223,6 +238,42 @@ class Champion
     public function removeType(Type $type): self
     {
         $this->type->removeElement($type);
+
+        return $this;
+    }
+
+    public function getImages(): ?string
+    {
+        return $this->images;
+    }
+
+    public function setImages(string $images): self
+    {
+        $this->images = $images;
+
+        return $this;
+    }
+
+    public function getWins(): ?int
+    {
+        return $this->wins;
+    }
+
+    public function setWins(?int $wins): self
+    {
+        $this->wins = $wins;
+
+        return $this;
+    }
+
+    public function getLosses(): ?int
+    {
+        return $this->losses;
+    }
+
+    public function setLosses(?int $losses): self
+    {
+        $this->losses = $losses;
 
         return $this;
     }
