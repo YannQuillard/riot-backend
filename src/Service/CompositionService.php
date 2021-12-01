@@ -212,6 +212,11 @@ class CompositionService
             }, $composition['champions']);
 
             $championEntitys = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($allChampionsId);
+
+            if(isset($championEntitys[0], $championEntitys[1], $championEntitys[2], $championEntitys[3], $championEntitys[4])) {
+                continue;
+            }
+            
             $string = sprintf('%s%s%s%s%s', $championEntitys[0]->getRiotId(), $championEntitys[1]->getRiotId(), $championEntitys[2]->getRiotId(), $championEntitys[3]->getRiotId(), $championEntitys[4]->getRiotId());
             $hash = sha1($string);
 
