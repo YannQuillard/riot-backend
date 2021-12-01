@@ -10,7 +10,6 @@ parameters:
     riot_token: '%env(resolve:RIOT_TOKEN)%'
     static_base_url: '%env(resolve:STATIC_BASE_URL)%'
     lol_version: '%env(resolve:LOL_VERSION)%'
-    language: '%env(resolve:LANGUAGE)%'
 
 services:
     # default configuration for services in *this* file
