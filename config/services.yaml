@@ -6,6 +6,7 @@
 parameters:
     riot_base_url_europe: '%env(resolve:RIOT_BASE_URL_EUROPE)%'
     riot_base_url_euw: '%env(resolve:RIOT_BASE_URL_EUW)%'
+    champion_base_url: '%env(resolve:CHAMPION_BASE_URL)%'
     riot_token: '%env(resolve:RIOT_TOKEN)%'
 services:
     # default configuration for services in *this* file

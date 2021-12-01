@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Service\ChampionService;
 use App\Entity\BestMatch;
 use App\Entity\BestMatchComposition;
 use App\Entity\Champion;
@@ -27,14 +28,22 @@ class CompositionService
      */
     private $parameterBag;
 
+    /**
+     * @var ChampionService
+     */
+    private $championService;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         HttpClientInterface $httpClient,
-        ParameterBagInterface $parameterBag)
+        ParameterBagInterface $parameterBag,
+        ChampionService $championService
+    )
     {
         $this->entityManager = $entityManager;
         $this->httpClient = $httpClient;
         $this->parameterBag = $parameterBag;
+        $this->championService = $championService;
     }
 
     public function getChallengers() :array {
@@ -101,9 +110,9 @@ class CompositionService
     {
         $returnArray = [];
 
-        foreach ($challengers['entries'] as $index => $player) {
+        //foreach ($challengers['entries'] as $index => $player) {
 
-            //$player = $challengers['entries'][3];
+            $player = $challengers['entries'][3];
 
             $summonerId = $player['summonerId'];
             $player = $this->getSummoner($summonerId);
@@ -149,11 +158,11 @@ class CompositionService
             }
             $returnArray[] = $matchResult;
             $this->storeMatch($matchResult);
-            echo sprintf("Sleeping for 30s, fetched player %s \n", $index);
-            sleep(30);
-        }
-        //return $matchResult;
-        return $returnArray;
+            //echo sprintf("Sleeping for 30s, fetched player %s \n", $index);
+            //sleep(30);
+        //}
+        return $matchResult;
+        //return $returnArray;
     }
 
     public function storeMatch($arrayMatchs) {
@@ -183,35 +192,17 @@ class CompositionService
         $this->entityManager->flush();
     }
 
-    public function storeChampions(array $champions): array {
-        $championsId = [];
-        foreach ($champions as $champion) {
-            $existingChampion = $this->entityManager->getRepository(Champion::class)->findOneByRiotId($champion['id']);
-            if (null !== $existingChampion) {
-                continue;
-            }
-
-            $championEntity = new Champion();
-            $championEntity
-                ->setRiotId($champion['id'])
-                ->setName($champion['name']);
-            $this->entityManager->persist($championEntity);
-            $championsId[] = $champion['id'];
-        }
-        $this->entityManager->flush();
-        return $championsId;
-    }
-
     public function storeComposition($match) {
         $compositions = [];
         foreach ($match['compositions'] as $composition) {
-            $this->storeChampions($composition['champions']);
+            //$this->championService->storeChampions($composition['champions']);
 
             $allChampionsId = array_map(function($champion) {
                 return $champion['id'];
             }, $composition['champions']);
 
             $championEntitys = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($allChampionsId);
+            dd($championEntitys);
             $string = sprintf('%s%s%s%s%s', $championEntitys[0]->getRiotId(), $championEntitys[1]->getRiotId(), $championEntitys[2]->getRiotId(), $championEntitys[3]->getRiotId(), $championEntitys[4]->getRiotId());
             $hash = sha1($string);
 
