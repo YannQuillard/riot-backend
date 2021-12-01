@@ -44,11 +44,23 @@ class Champion
      */
     private $picks;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Lane::class)
+     */
+    private $lane;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Type::class)
+     */
+    private $type;
+
     public function __construct()
     {
         $this->compositions = new ArrayCollection();
         $this->bans = new ArrayCollection();
         $this->picks = new ArrayCollection();
+        $this->lane = new ArrayCollection();
+        $this->type = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,6 +175,54 @@ class Champion
                 $pick->setChampion(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Lane[]
+     */
+    public function getLane(): Collection
+    {
+        return $this->lane;
+    }
+
+    public function addLane(Lane $lane): self
+    {
+        if (!$this->lane->contains($lane)) {
+            $this->lane[] = $lane;
+        }
+
+        return $this;
+    }
+
+    public function removeLane(Lane $lane): self
+    {
+        $this->lane->removeElement($lane);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Type[]
+     */
+    public function getType(): Collection
+    {
+        return $this->type;
+    }
+
+    public function addType(Type $type): self
+    {
+        if (!$this->type->contains($type)) {
+            $this->type[] = $type;
+        }
+
+        return $this;
+    }
+
+    public function removeType(Type $type): self
+    {
+        $this->type->removeElement($type);
 
         return $this;
     }
