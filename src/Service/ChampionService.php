@@ -55,30 +55,17 @@ class ChampionService
             $championsInfos = $this->getChampionInfos($champion['name']);
             $typesArray = $this->storeType($championsInfos['types']);
             $lanesArray = $this->storeLane($championsInfos['lanes']);
+            $championsStaticInfos = $this->getChampionRiotInfos($champion['name']);
+            dd($championsStaticInfos);
 
             foreach ($typesArray as $type)
             {
-
-                /*$existingType = $this->entityManager->getRepository(Champion::class)->findByType($type);
-                if(null !== $existingType) {
-                    continue;
-                }*/
-
                 $championEntity->addType($type);
             }
 
             foreach ($lanesArray as $lane) {
-
-                /*$existingType = $this->entityManager->getRepository(Champion::class)->findByLane($lane);
-
-                if(null !== $existingType) {
-                    continue;
-                }*/
-
                 $championEntity->addLane($lane);
             }
-
-
 
             $this->entityManager->persist($championEntity);
 
@@ -89,13 +76,40 @@ class ChampionService
         return $championsId;
     }
 
-    public function getChampionInfos(string $name) {
+    /**
+     * @param string $name
+     * @return array
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function getChampionInfos(string $name): array {
         $championBase = $this->parameterBag->get('champion_base_url');
 
-        $riotChallengerUrl = sprintf('%s/all_champion.json', $championBase);
-        $response = $this->httpClient->request('GET', $riotChallengerUrl);
+        $riotChampionUrl = sprintf('%s/all_champion.json', $championBase);
+        $response = $this->httpClient->request('GET', $riotChampionUrl);
         $championsInfos = json_decode($response->getContent(), true);
         return $championsInfos[$name];
+    }
+
+    /**
+     * @param string $name
+     * @return array
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function getChampionRiotInfos(string $name): array {
+        $riotStatic = $this->parameterBag->get('static_base_url');
+        $riotVersion = $this->parameterBag->get('lol_version');
+        $language = $this->parameterBag->get('language');
+
+        $riotChampionUrl = sprintf('%s/%s/data/%s/champion.json', $riotStatic, $riotVersion, $language);
+        $response = $this->httpClient->request('GET', $riotChampionUrl);
+        $championsInfos = json_decode($response->getContent(), true);
+        return $championsInfos['data'][$name];
     }
 
     /**
@@ -150,5 +164,9 @@ class ChampionService
 
         $this->entityManager->flush();
         return $storeLane;
+    }
+
+    public function storeImage() {
+
     }
 }
