@@ -54,6 +54,31 @@ class Champion
      */
     private $type;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $image;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $wins;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $losses;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $imageLoading;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $imageSplash;
+
     public function __construct()
     {
         $this->compositions = new ArrayCollection();
@@ -223,6 +248,66 @@ class Champion
     public function removeType(Type $type): self
     {
         $this->type->removeElement($type);
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getWins(): ?int
+    {
+        return $this->wins;
+    }
+
+    public function setWins(?int $wins): self
+    {
+        $this->wins = $wins;
+
+        return $this;
+    }
+
+    public function getLosses(): ?int
+    {
+        return $this->losses;
+    }
+
+    public function setLosses(?int $losses): self
+    {
+        $this->losses = $losses;
+
+        return $this;
+    }
+
+    public function getImageLoading(): ?string
+    {
+        return $this->imageLoading;
+    }
+
+    public function setImageLoading(string $imageLoading): self
+    {
+        $this->imageLoading = $imageLoading;
+
+        return $this;
+    }
+
+    public function getImageSplash(): ?string
+    {
+        return $this->imageSplash;
+    }
+
+    public function setImageSplash(string $imageSplash): self
+    {
+        $this->imageSplash = $imageSplash;
 
         return $this;
     }
