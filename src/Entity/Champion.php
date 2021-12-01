@@ -34,9 +34,21 @@ class Champion
      */
     private $compositions;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Ban::class, mappedBy="champion", orphanRemoval=true)
+     */
+    private $bans;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Pick::class, mappedBy="champion", orphanRemoval=true)
+     */
+    private $picks;
+
     public function __construct()
     {
         $this->compositions = new ArrayCollection();
+        $this->bans = new ArrayCollection();
+        $this->picks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,6 +102,66 @@ class Champion
     {
         if ($this->compositions->removeElement($composition)) {
             $composition->removeChampion($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Ban[]
+     */
+    public function getBans(): Collection
+    {
+        return $this->bans;
+    }
+
+    public function addBan(Ban $ban): self
+    {
+        if (!$this->bans->contains($ban)) {
+            $this->bans[] = $ban;
+            $ban->setChampion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBan(Ban $ban): self
+    {
+        if ($this->bans->removeElement($ban)) {
+            // set the owning side to null (unless already changed)
+            if ($ban->getChampion() === $this) {
+                $ban->setChampion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pick[]
+     */
+    public function getPicks(): Collection
+    {
+        return $this->picks;
+    }
+
+    public function addPick(Pick $pick): self
+    {
+        if (!$this->picks->contains($pick)) {
+            $this->picks[] = $pick;
+            $pick->setChampion($this);
+        }
+
+        return $this;
+    }
+
+    public function removePick(Pick $pick): self
+    {
+        if ($this->picks->removeElement($pick)) {
+            // set the owning side to null (unless already changed)
+            if ($pick->getChampion() === $this) {
+                $pick->setChampion(null);
+            }
         }
 
         return $this;
