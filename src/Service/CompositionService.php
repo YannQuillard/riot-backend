@@ -110,9 +110,9 @@ class CompositionService
     {
         $returnArray = [];
 
-        //foreach ($challengers['entries'] as $index => $player) {
+        foreach ($challengers['entries'] as $index => $player) {
 
-            $player = $challengers['entries'][3];
+            //$player = $challengers['entries'][10];
 
             $summonerId = $player['summonerId'];
             $player = $this->getSummoner($summonerId);
@@ -158,11 +158,11 @@ class CompositionService
             }
             $returnArray[] = $matchResult;
             $this->storeMatch($matchResult);
-            //echo sprintf("Sleeping for 30s, fetched player %s \n", $index);
-            //sleep(30);
-        //}
-        return $matchResult;
-        //return $returnArray;
+            echo sprintf("Sleeping for 30s, fetched player %s \n", $index);
+            sleep(30);
+        }
+        //return $matchResult;
+        return $returnArray;
     }
 
     public function storeMatch($arrayMatchs) {
@@ -195,23 +195,17 @@ class CompositionService
     public function storeComposition($match) {
         $compositions = [];
         foreach ($match['compositions'] as $composition) {
-            //$this->championService->storeChampions($composition['champions']);
+            $this->championService->storeChampions($composition['champions']);
 
             $allChampionsId = array_map(function($champion) {
                 return $champion['id'];
             }, $composition['champions']);
 
-            $championEntitys = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($allChampionsId);
-<<<<<<< HEAD
-
-            if(isset($championEntitys[0], $championEntitys[1], $championEntitys[2], $championEntitys[3], $championEntitys[4])) {
+            $championEntities = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($allChampionsId);
+            if(empty($championEntities)) {
                 continue;
             }
-            
-=======
-            dd($championEntitys);
->>>>>>> cb9e441b7320199b48404985510134d9b1dbc8cc
-            $string = sprintf('%s%s%s%s%s', $championEntitys[0]->getRiotId(), $championEntitys[1]->getRiotId(), $championEntitys[2]->getRiotId(), $championEntitys[3]->getRiotId(), $championEntitys[4]->getRiotId());
+            $string = sprintf('%s%s%s%s%s', ($championEntities[0])->getRiotId(), ($championEntities[1])->getRiotId(), ($championEntities[2])->getRiotId(), ($championEntities[3])->getRiotId(), ($championEntities[4])->getRiotId());
             $hash = sha1($string);
 
             $result = $this->entityManager->getRepository(Composition::class)->findByHash($hash);
