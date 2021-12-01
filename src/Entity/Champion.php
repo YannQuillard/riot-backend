@@ -34,9 +34,33 @@ class Champion
      */
     private $compositions;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Ban::class, mappedBy="champion", orphanRemoval=true)
+     */
+    private $bans;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Pick::class, mappedBy="champion", orphanRemoval=true)
+     */
+    private $picks;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Lane::class)
+     */
+    private $lane;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Type::class)
+     */
+    private $type;
+
     public function __construct()
     {
         $this->compositions = new ArrayCollection();
+        $this->bans = new ArrayCollection();
+        $this->picks = new ArrayCollection();
+        $this->lane = new ArrayCollection();
+        $this->type = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -91,6 +115,114 @@ class Champion
         if ($this->compositions->removeElement($composition)) {
             $composition->removeChampion($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Ban[]
+     */
+    public function getBans(): Collection
+    {
+        return $this->bans;
+    }
+
+    public function addBan(Ban $ban): self
+    {
+        if (!$this->bans->contains($ban)) {
+            $this->bans[] = $ban;
+            $ban->setChampion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBan(Ban $ban): self
+    {
+        if ($this->bans->removeElement($ban)) {
+            // set the owning side to null (unless already changed)
+            if ($ban->getChampion() === $this) {
+                $ban->setChampion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pick[]
+     */
+    public function getPicks(): Collection
+    {
+        return $this->picks;
+    }
+
+    public function addPick(Pick $pick): self
+    {
+        if (!$this->picks->contains($pick)) {
+            $this->picks[] = $pick;
+            $pick->setChampion($this);
+        }
+
+        return $this;
+    }
+
+    public function removePick(Pick $pick): self
+    {
+        if ($this->picks->removeElement($pick)) {
+            // set the owning side to null (unless already changed)
+            if ($pick->getChampion() === $this) {
+                $pick->setChampion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Lane[]
+     */
+    public function getLane(): Collection
+    {
+        return $this->lane;
+    }
+
+    public function addLane(Lane $lane): self
+    {
+        if (!$this->lane->contains($lane)) {
+            $this->lane[] = $lane;
+        }
+
+        return $this;
+    }
+
+    public function removeLane(Lane $lane): self
+    {
+        $this->lane->removeElement($lane);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Type[]
+     */
+    public function getType(): Collection
+    {
+        return $this->type;
+    }
+
+    public function addType(Type $type): self
+    {
+        if (!$this->type->contains($type)) {
+            $this->type[] = $type;
+        }
+
+        return $this;
+    }
+
+    public function removeType(Type $type): self
+    {
+        $this->type->removeElement($type);
 
         return $this;
     }
