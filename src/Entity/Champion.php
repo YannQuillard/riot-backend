@@ -57,7 +57,7 @@ class Champion
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $images;
+    private $image;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -68,6 +68,16 @@ class Champion
      * @ORM\Column(type="integer", nullable=true)
      */
     private $losses;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $imageLoading;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $imageSplash;
 
     public function __construct()
     {
@@ -242,14 +252,14 @@ class Champion
         return $this;
     }
 
-    public function getImages(): ?string
+    public function getImage(): ?string
     {
-        return $this->images;
+        return $this->image;
     }
 
-    public function setImages(string $images): self
+    public function setImage(string $image): self
     {
-        $this->images = $images;
+        $this->image = $image;
 
         return $this;
     }
@@ -274,6 +284,30 @@ class Champion
     public function setLosses(?int $losses): self
     {
         $this->losses = $losses;
+
+        return $this;
+    }
+
+    public function getImageLoading(): ?string
+    {
+        return $this->imageLoading;
+    }
+
+    public function setImageLoading(string $imageLoading): self
+    {
+        $this->imageLoading = $imageLoading;
+
+        return $this;
+    }
+
+    public function getImageSplash(): ?string
+    {
+        return $this->imageSplash;
+    }
+
+    public function setImageSplash(string $imageSplash): self
+    {
+        $this->imageSplash = $imageSplash;
 
         return $this;
     }
