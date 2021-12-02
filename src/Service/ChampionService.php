@@ -29,7 +29,8 @@ class ChampionService
     public function __construct(
         EntityManagerInterface $entityManager,
         HttpClientInterface $httpClient,
-        ParameterBagInterface $parameterBag)
+        ParameterBagInterface $parameterBag
+    )
     {
         $this->entityManager = $entityManager;
         $this->httpClient = $httpClient;
