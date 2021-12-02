@@ -59,26 +59,61 @@ class PlayerService {
             $player = $this->storePlayer($params['username']);
         }
 
-        $champions = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($params['champions']);
         
-        foreach ($champions as $champion) {
-            $existingChampion = $this->entityManager->getRepository(Player::class)->getFavorite($champion);
-            dd($existingChampion);
-            if(!empty($existingChampion)) {
-                continue;
+
+        $champions = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($params['champions']);
+        $champions = array_map(function($champion) {
+            return $champion->getRiotId();
+        }, $champions);
+        // récup les favorites appartenant à un joueur
+        $favoriteIds = [];
+        foreach($player->getFavorite() as $favorite) {
+            
+            $favorite = $favorite->getRiotId();
+            $favoriteIds[] = $favorite;
+            
+        }
+        
+        // si le player a déjà des favoris,
+        if ($champions != null) {
+            //comparer les favoris existants avec les favoris obtenus précedemment
+            $addDifference = array_diff($champions, $favoriteIds);
+            // une fois que les 2 tableaux sont comparés, les favoris qui ne sont pas présents dans les favoris existants seront ajoutés dans la BDD
+
+            $newFavoriteChampions = $this->entityManager->getRepository(Champion::class)->findBy(['riotId' => $addDifference]);
+
+            foreach ($newFavoriteChampions as $newFavoriteChampion) {
+                $player->addFavorite($newFavoriteChampion);
             }
 
-            $player->addFavorite($champion);
-            $this->entityManager->persist($player);
+            // on récupère les id présents sur les mêmes arrays
+            $removeDifference = array_diff($favoriteIds, $params['champions']);
+
+
+            // les favoris présents dans les favoris existants, mais plus dans les favoris envoyés dans les paramètres seront supprimés de la BDD
+            $oldFavoriteChampions = $this->entityManager->getRepository(Champion::class)->findBy(['riotId' => $removeDifference]);
+            
+            foreach ($oldFavoriteChampions as $oldFavoriteChampion) {
+                $player->removeFavorite($oldFavoriteChampion);
+            }    
+            
+        }
+        
+        else {
+            // clear all
+            $removeChampion = $this->entityManager->getRepository(Champion::class)->findBy(['riotId' => $favoriteIds]);
+            foreach($removeChampion as $champion) {
+                $player->removeFavorite($champion);
+            }
         }
 
+        
+        $this->entityManager->persist($player);
         
         $this->entityManager->flush();
 
         return $player;
 
-        // Jdois déjà avoir un champion dans la BDD
-        // On ajoute un champion dans un slot
     }
 
     public function storePlayer(string $username) {
