@@ -202,7 +202,7 @@ class CompositionService
             }, $composition['champions']);
 
             $championEntities = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($allChampionsId);
-            if(empty($championEntities)) {
+            if(empty($championEntities) || count($championEntities) < 4) {
                 continue;
             }
             $string = sprintf('%s%s%s%s%s', ($championEntities[0])->getRiotId(), ($championEntities[1])->getRiotId(), ($championEntities[2])->getRiotId(), ($championEntities[3])->getRiotId(), ($championEntities[4])->getRiotId());
