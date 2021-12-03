@@ -224,16 +224,24 @@ class CompositionService
                 $compositionEntity = $this->entityManager->getRepository(Composition::class)->findOneById($result);
             }
 
+            $compositionEntityWins = $compositionEntity->getWins();
+            $compositionEntityLosses = $compositionEntity->getLosses();
             if($composition['win']) {
-                $compositionEntityWins = $compositionEntity->getWins();
+
                 $compositionEntityWins++;
                 $compositionEntity->setWins($compositionEntityWins);
             }
             else {
-                $compositionEntityLosses = $compositionEntity->getLosses();
+
                 $compositionEntityLosses++;
                 $compositionEntity->setLosses($compositionEntityLosses);
             }
+            $compositionEntityWins = $compositionEntity->getWins();
+            
+            $compositionEntityLosses = $compositionEntity->getLosses();
+
+            $winrate = $compositionEntityLosses +
+            $compositionEntity->setWinRate();
 
             $this->entityManager->persist($compositionEntity);
             $compositions[] = [
