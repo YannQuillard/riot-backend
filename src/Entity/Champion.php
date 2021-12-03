@@ -79,6 +79,11 @@ class Champion
      */
     private $imageSplash;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $winRate;
+
     public function __construct()
     {
         $this->compositions = new ArrayCollection();
@@ -308,6 +313,18 @@ class Champion
     public function setImageSplash(string $imageSplash): self
     {
         $this->imageSplash = $imageSplash;
+
+        return $this;
+    }
+
+    public function getWinRate(): ?int
+    {
+        return $this->winRate;
+    }
+
+    public function setWinRate(?int $winRate): self
+    {
+        $this->winRate = $winRate;
 
         return $this;
     }
