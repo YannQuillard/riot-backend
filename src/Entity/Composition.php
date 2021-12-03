@@ -44,6 +44,11 @@ class Composition
      */
     private $bestMatchCompositions;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $winRate;
+
     public function __construct()
     {
         $this->champions = new ArrayCollection();
@@ -141,6 +146,18 @@ class Composition
                 $bestMatchComposition->setComposition(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getWinRate(): ?int
+    {
+        return $this->winRate;
+    }
+
+    public function setWinRate(?int $winRate): self
+    {
+        $this->winRate = $winRate;
 
         return $this;
     }

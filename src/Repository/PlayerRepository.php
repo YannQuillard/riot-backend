@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Champion;
 use App\Entity\Player;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,6 +19,23 @@ class PlayerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Player::class);
     }
+
+    public function getFavorite(Champion $champion) {
+        $query = $this->createQueryBuilder('p')
+                      ->select('p')
+                      ->leftJoin('p.favorite', 'c')
+                      ->addSelect('c.id');
+ 
+        $query = $query
+                    ->where($query->expr()->in('c', ':c'))
+                    ->setParameter('c', $champion->getId())
+                    ->getQuery()
+                    ->getResult();
+
+        return $query;
+    }
+
+
 
     // /**
     //  * @return Player[] Returns an array of Player objects
