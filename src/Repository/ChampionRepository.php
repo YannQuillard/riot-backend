@@ -28,6 +28,19 @@ class ChampionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function getChampionsForIdsByLane(array $ids, int $laneId) {
+        return $this->createQueryBuilder('c')
+            ->join('c.lane', 'l')
+            ->where('c.riotId IN (:ids)')
+            ->andWhere('l.id = :lid')
+            ->setParameter('ids', $ids)
+            ->setParameter('lid', $laneId)
+            ->orderBy('c.winRate', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Champion[] Returns an array of Champion objects
     //  */

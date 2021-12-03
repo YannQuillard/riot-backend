@@ -45,7 +45,7 @@ class MatchService
 
         //Récupérer les favoris des players en fonction de la lane choisit
         $playerEntity = $this->entityManager->getRepository(Player::class)->findOneByName($playerParams);
-        $favoriteIds = [];
+        $lane = $this->entityManager->getRepository(Lane::class)->findOneByName($laneParams);
         if($playerEntity) {
 
             foreach($playerEntity->getFavorite() as $favorite) {
@@ -54,29 +54,11 @@ class MatchService
                 $favoriteIds[] = $favorite;
 
             }
-            //$lane = $this->entityManager->getRepository(Lane::class)->findOneByName('TOP');
-            $champions = $this->entityManager->getRepository(Champion::class)->findBy(['riotId' => $favoriteIds]);
-            // ORDER BY winrate ASC
-            //$selectedChampions = $this->entityManager->getRepository(Champion::class)->findBy(['riotId' => $favoriteIds, 'lane' => $lane]);
-            $championsByLane = [];
 
-            // POSSIBLE DE FAIRE UNE REQUETE SQL ?
-            foreach ($champions as $championLane) {
-                foreach ($championLane->getLane() as $lane) {
-                    if($lane->getName() !== $laneParams) {
-                        continue;
-                    }
-                    $championsByLane[] = $championLane;
-                }
-            }
-
-            $selectedChampions = $championsByLane;
+            $selectedChampions = $this->entityManager->getRepository(Champion::class)->getChampionsForIdsByLane($favoriteIds, $lane->getId());
         }
         else {
-            // IF NO FAVORITES avoir les meilleurs champions pour la lane
-            //ORDER BY winrate ASC
-            //$selectedChampions = $this->entityManager->getRepository(Champion::class)->findBy(['riotId' => $favoriteIds, 'lane' => $lane]);
-
+            $selectedChampions = $this->entityManager->getRepository(Champion::class)->getChampionsByLane($lane->getId());
         }
 
         //$championsIdsCompositionWinRate = $this->getCompositionChampionWinRateByChampions($selectedChampions);
