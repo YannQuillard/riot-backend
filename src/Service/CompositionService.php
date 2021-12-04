@@ -188,6 +188,7 @@ class CompositionService
                 $this->entityManager->persist($bestMatchComposition);
             }
             $this->entityManager->persist($bestMatch);
+            $this->entityManager->flush();
         }
         $this->entityManager->flush();
     }
@@ -202,7 +203,7 @@ class CompositionService
             }, $composition['champions']);
 
             $championEntities = $this->entityManager->getRepository(Champion::class)->getChampionsForIds($allChampionsId);
-            if(empty($championEntities) || count($championEntities) < 4) {
+            if(empty($championEntities) || count($championEntities) < 5) {
                 continue;
             }
             $string = sprintf('%s%s%s%s%s', ($championEntities[0])->getRiotId(), ($championEntities[1])->getRiotId(), ($championEntities[2])->getRiotId(), ($championEntities[3])->getRiotId(), ($championEntities[4])->getRiotId());
@@ -224,16 +225,32 @@ class CompositionService
                 $compositionEntity = $this->entityManager->getRepository(Composition::class)->findOneById($result);
             }
 
+            $compositionEntityWins = $compositionEntity->getWins();
+            $compositionEntityLosses = $compositionEntity->getLosses();
             if($composition['win']) {
-                $compositionEntityWins = $compositionEntity->getWins();
+
                 $compositionEntityWins++;
                 $compositionEntity->setWins($compositionEntityWins);
             }
             else {
-                $compositionEntityLosses = $compositionEntity->getLosses();
+
                 $compositionEntityLosses++;
                 $compositionEntity->setLosses($compositionEntityLosses);
             }
+            $compositionEntityWins = $compositionEntity->getWins();
+            
+            $compositionEntityLosses = $compositionEntity->getLosses();
+            // Une seule win = 100% de winrate
+            if($compositionEntityWins !== null || $compositionEntityLosses !== null) {
+                $winrate = $compositionEntityWins / ($compositionEntityLosses + $compositionEntityWins) * 100;
+            }
+            else {
+                $winrate = null;
+            }
+
+            $compositionEntity->setWinRate($winrate);
+
+            $this->championService->setWinRate($composition['champions'], $composition['win']);
 
             $this->entityManager->persist($compositionEntity);
             $compositions[] = [

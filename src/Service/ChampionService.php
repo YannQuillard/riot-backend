@@ -157,4 +157,39 @@ class ChampionService
         $this->entityManager->flush();
         return $storeLane;
     }
+
+    public function setWinRate(array $champions, bool $win) {
+        foreach ($champions as $champion) {
+            $existingChampion = $this->entityManager->getRepository(Champion::class)->findOneByRiotId($champion['id']);
+            if (null === $existingChampion) {
+                continue;
+            }
+            $championEntityWins = $existingChampion->getWins();
+            $championEntityLosses = $existingChampion->getLosses();
+            if($win) {
+
+                $championEntityWins++;
+                $existingChampion->setWins($championEntityWins);
+            }
+            else {
+
+                $championEntityLosses++;
+                $existingChampion->setLosses($championEntityLosses);
+            }
+            $championEntityWins = $existingChampion->getWins();
+            $championEntityLosses = $existingChampion->getLosses();
+            // Une seule win = 100% de winrate
+            if($championEntityWins !== null || $championEntityLosses !== null) {
+                $winrate = $championEntityWins / ($championEntityLosses + $championEntityWins) * 100;
+            }
+            else {
+                $winrate = null;
+            }
+
+            $existingChampion->setWinRate($winrate);
+            $this->entityManager->persist($existingChampion);
+        }
+
+        $this->entityManager->flush();
+    }
 }
