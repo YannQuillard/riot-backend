@@ -44,5 +44,5 @@ class PlayerController extends AbstractController
         $riotPlayer = $this->playerService->addFavorite($params);
         return $this->json($riotPlayer);
     }
-    
+       
 }
