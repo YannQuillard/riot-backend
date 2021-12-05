@@ -178,15 +178,15 @@ class ChampionService
             }
             $championEntityWins = $existingChampion->getWins();
             $championEntityLosses = $existingChampion->getLosses();
-            // Une seule win = 100% de winrate
+
             if($championEntityWins !== null || $championEntityLosses !== null) {
-                $winrate = $championEntityWins / ($championEntityLosses + $championEntityWins) * 100;
+                $winRate = $championEntityWins / ($championEntityLosses + $championEntityWins) * 100;
             }
             else {
-                $winrate = null;
+                $winRate = null;
             }
 
-            $existingChampion->setWinRate($winrate);
+            $existingChampion->setWinRate($winRate);
             $this->entityManager->persist($existingChampion);
         }
 

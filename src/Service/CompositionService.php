@@ -206,14 +206,13 @@ class CompositionService
             if(empty($championEntities) || count($championEntities) < 5) {
                 continue;
             }
-            $string = sprintf('%s%s%s%s%s', ($championEntities[0])->getRiotId(), ($championEntities[1])->getRiotId(), ($championEntities[2])->getRiotId(), ($championEntities[3])->getRiotId(), ($championEntities[4])->getRiotId());
-            $hash = sha1($string);
+            $string = sprintf('#%s##%s##%s##%s##%s#', ($championEntities[0])->getRiotId(), ($championEntities[1])->getRiotId(), ($championEntities[2])->getRiotId(), ($championEntities[3])->getRiotId(), ($championEntities[4])->getRiotId());
 
-            $result = $this->entityManager->getRepository(Composition::class)->findByHash($hash);
+            $result = $this->entityManager->getRepository(Composition::class)->findByHash($string);
 
             if(empty($result)) {
                 $compositionEntity = new Composition();
-                $compositionEntity->setHash($hash);
+                $compositionEntity->setHash($string);
 
                 foreach ($composition['champions'] as $champion) {
                     $championEntity = $this->entityManager->getRepository(Champion::class)->findOneByRiotId($champion['id']);
