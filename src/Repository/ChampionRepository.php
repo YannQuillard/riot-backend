@@ -25,7 +25,8 @@ class ChampionRepository extends ServiceEntityRepository
             ->setParameter('ids', $ids)
             ->orderBy('c.riotId', 'ASC')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
     }
 
     public function getChampionsForIdsByLane(array $ids, int $laneId) {
@@ -34,6 +35,18 @@ class ChampionRepository extends ServiceEntityRepository
             ->where('c.riotId IN (:ids)')
             ->andWhere('l.id = :lid')
             ->setParameter('ids', $ids)
+            ->setParameter('lid', $laneId)
+            ->orderBy('c.winRate', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
+    public function getChampionsByLane(int $laneId) {
+        return $this->createQueryBuilder('c')
+            ->join('c.lane', 'l')
+            ->where('l.id = :lid')
             ->setParameter('lid', $laneId)
             ->orderBy('c.winRate', 'DESC')
             ->getQuery()
