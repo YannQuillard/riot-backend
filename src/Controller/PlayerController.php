@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Service\PlayerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class PlayerController extends AbstractController
 {
@@ -16,8 +19,14 @@ class PlayerController extends AbstractController
      */
     private $playerService;
 
-    public function __construct(PlayerService $playerService) {
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    public function __construct(PlayerService $playerService, SerializerInterface $serializer) {
         $this->playerService = $playerService;
+        $this->serializer = $serializer;
     }
     /**
      * @Route("/player", name="player")
@@ -41,8 +50,8 @@ class PlayerController extends AbstractController
         if(!isset($params['username'])) {
             throw new HttpException(400, 'Missing username');
         }
-        $riotPlayer = $this->playerService->addFavorite($params);
-        return $this->json($riotPlayer);
+        $this->playerService->addFavorite($params);
+        return  $this->json('new Player added');
     }
        
 }
